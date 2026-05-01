@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "469329963968",
+    "project_id": "diaryapp-35e15",
+    "storage_bucket": "diaryapp-35e15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469329963968:android:a474a1c3e27e7d11107625",
+        "android_client_info": {
+          "package_name": "com.anonymous.diaryapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "469329963968-26ouu57mcmg3j7dtlml4m2rdbd9o957j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.diaryapp",
+            "certificate_hash": "95286745382ab0dcc7dac8ba9ddb08f665c123d7"
+          }
+        },
+        {
+          "client_id": "469329963968-dfivlli321kc6g6lr80nf9lrl14b1uar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANMNMytTBamzFaI8YIbJgGb2UoSTPVzOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "469329963968-dfivlli321kc6g6lr80nf9lrl14b1uar.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "469329963968-r0vpnfeiv2t76ml7m79nk8hk68jiso4e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.anonymous.diaryapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
