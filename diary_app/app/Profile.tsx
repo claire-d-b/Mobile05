@@ -48,6 +48,9 @@ interface Props {
   login: string | null;
 }
 
+const successColor = "#25783F";
+const errorColor = "#A12237";
+
 const Profile = ({ login }: Props) => {
   const { localLogin } = useAuthContext();
   const firebaseEmail = getAuth().currentUser?.email;
@@ -64,7 +67,7 @@ const Profile = ({ login }: Props) => {
   console.log("authhhh", localLogin);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [feeling, setFeeling] = useState(1);
+  const [feeling, setFeeling] = useState(3);
 
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
@@ -109,7 +112,7 @@ const Profile = ({ login }: Props) => {
   };
 
   const fetchCount = async () => {
-    if (!localLogin) return;
+    if (!login) return;
 
     try {
       const res = await fetch(
@@ -144,12 +147,75 @@ const Profile = ({ login }: Props) => {
       }
       console.log("✅ Entry deleted:", data.entry);
       await fetchEntries(page); // ← recharge la page courante
+      fetchCount();
     } catch (err) {
       console.error("❌ Error deleting entry:", err);
     }
   };
 
+  // const loadMore = async () => {
+  //   if (page < totalPages) {
+  //     const nextPage = page + 1;
+  //     await fetchEntries(nextPage);
+  //     setPage(nextPage);
+  //   }
+  // };
+
+  // const loadLess = async () => {
+  //   if (page > 0) {
+  //     const nextPage = page - 1;
+  //     await fetchEntries(nextPage);
+  //     setPage(nextPage);
+  //   }
+  // };
+
+  const handleSubmit = async () => {
+    setMessage("");
+    if (!title || !content) {
+      setMessage("Please provide a title and content.");
+      setType("error");
+      return;
+    }
+    console.log("📡 auth.currentUser:", login);
+    console.log("📡 email utilisé:", email);
+
+    try {
+      const res = await fetch(`${backendUrl}/entries`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+          title,
+          feeling,
+          content,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("❌ Failed to create entry:", data.error);
+        return;
+      }
+
+      console.log("✅ Entry created:", data);
+      setMessage("Entry successfully created!");
+      setType("success");
+
+      // Reset
+      setTitle("");
+      setContent("");
+      setFeeling(1);
+      await fetchEntries(0);
+      fetchCount();
+      // hideModal();
+    } catch (err) {
+      console.error("❌ Error creating entry:", err);
+    }
+  };
   useEffect(() => {
+    setType("");
     if (!login) return;
 
     fetchCount();
@@ -285,8 +351,179 @@ const Profile = ({ login }: Props) => {
               </View>
             </View>
           </CModal> */}
+          {/* </View> */}
+          {/* <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+          >
+            <CIconButton
+              icon="chevron-left"
+              iconColor="#534DB3"
+              containerColor=""
+              size={25}
+              onPress={loadLess}
+            />
+            <CIconButton
+              icon="chevron-right"
+              iconColor="#534DB3"
+              containerColor=""
+              size={25}
+              onPress={loadMore}
+            />
+          </View> */}
+          {totalNbOfEntries < 2 && (
+            // <CModal
+            //   type={type}
+            //   message={message}
+            //   visible={visible}
+            //   hideModal={hideModal}
+            //   showModal={showModal}
+            //   style={{ width: "100%", height: "100%" }}
+            // >
+            <View style={{ flex: 1, width: "100%" }}>
+              <View style={{ width: "100%", alignSelf: "flex-start" }}>
+                <CTextInput
+                  secureTextEntry={false}
+                  right={<></>}
+                  onBlur={() => {}}
+                  onChangeText={(str) => {
+                    setTitle(str);
+                  }}
+                  label="Title"
+                  msg={title}
+                  placeholder="Please add a title"
+                  variant="outlined"
+                  textColor="#534DB3"
+                  outlineColor="#534DB3"
+                  outlineStyle={{ borderRadius: 10 }}
+                  activeOutlineColor="#534DB3"
+                  underlineColor="#534DB3"
+                  activeUnderlineColor="#534DB3"
+                  selectionColor="#534DB3"
+                  contentStyle={{}}
+                  style={{ marginHorizontal: 20 }}
+                  disabled={false}
+                  multiline={false}
+                />
+              </View>
+              <View style={{ display: "flex", width: "100%" }}>
+                <CRating
+                  setRating={setFeeling}
+                  color="#BBB0D1"
+                  focusColor="#534DB3"
+                />
+              </View>
+
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "100%",
+                  }}
+                >
+                  <CTextInput
+                    secureTextEntry={false}
+                    right={<></>}
+                    onBlur={() => {}}
+                    onChangeText={(str) => {
+                      setContent(str);
+                    }}
+                    label="Content"
+                    msg={content}
+                    placeholder="Please add entries"
+                    variant="outlined"
+                    textColor="#534DB3"
+                    outlineColor="#534DB3"
+                    outlineStyle={{ borderRadius: 10 }}
+                    activeOutlineColor="#534DB3"
+                    underlineColor="#534DB3"
+                    activeUnderlineColor="#534DB3"
+                    selectionColor="#534DB3"
+                    contentStyle={{}}
+                    style={{ marginHorizontal: 20 }}
+                    disabled={false}
+                    multiline={true}
+                  />
+                </View>
+                <View
+                  style={{
+                    alignSelf: "flex-end",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginRight: 20,
+                  }}
+                >
+                  <Text style={{ color: "#353172" }}>Add a new entry</Text>
+                  <CIconButton
+                    icon="plus"
+                    iconColor="white"
+                    containerColor="#534DB3"
+                    size={20}
+                    onPress={handleSubmit}
+                  />
+                </View>
+                {type === "error" && (
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CIconButton
+                      mode="outlined"
+                      style={{ borderColor: errorColor, borderWidth: 1 }}
+                      icon="close"
+                      iconColor={errorColor}
+                      containerColor=""
+                      size={12}
+                      onPress={() => {}}
+                    />
+                    <Text style={{ color: errorColor }}>{message}</Text>
+                  </View>
+                )}
+                {type === "success" && (
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CIconButton
+                      mode="outlined"
+                      style={{ borderColor: successColor, borderWidth: 1 }}
+                      icon="check"
+                      iconColor={successColor}
+                      containerColor=""
+                      size={12}
+                      onPress={() => {}}
+                    />
+                    <Text style={{ color: successColor }}>{message}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
           <View
-            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+            style={{ width: "100%", display: "flex", flexDirection: "column" }}
           >
             {entries &&
               entries.length > 0 &&
@@ -354,31 +591,10 @@ const Profile = ({ login }: Props) => {
                 );
               })}
           </View>
-          {/* <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-around",
-              alignItems: "center",
-            }}
-          >
-            <CIconButton
-              icon="chevron-left"
-              iconColor="#534DB3"
-              containerColor=""
-              size={25}
-              onPress={loadLess}
-            />
-            <CIconButton
-              icon="chevron-right"
-              iconColor="#534DB3"
-              containerColor=""
-              size={25}
-              onPress={loadMore}
-            />
-          </View> */}
           <Text style={{ color: "#353172", padding: 40 }}>
-            {`Your feel for ${totalNbOfEntries} entries`}
+            {(totalNbOfEntries > 0 &&
+              `Your feel for ${totalNbOfEntries} entries`) ||
+              `No entry found.`}
           </Text>
         </View>
       </PaperProvider>
