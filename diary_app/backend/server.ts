@@ -344,6 +344,44 @@ app.get(
   },
 );
 
+// GET FEELING STATS FOR USER
+app.get(
+  "/entries/:email/stats",
+  async (req: Request<{ email: string }>, res: Response) => {
+    const { email } = req.params;
+    try {
+      const result = await pool.query(
+        `SELECT feeling, COUNT(*) as count
+       FROM diary_entries e
+       JOIN users u ON e.user_id = u.id
+       WHERE u.login = $1
+       GROUP BY feeling
+       ORDER BY feeling`,
+        [email],
+      );
+
+      const total = result.rows.reduce((sum, r) => sum + parseInt(r.count), 0);
+      const stats = [1, 2, 3, 4, 5].reduce(
+        (acc, f) => {
+          const row = result.rows.find((r) => parseInt(r.feeling) === f);
+          const count = row ? parseInt(row.count) : 0;
+          acc[f] = {
+            count,
+            percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+          };
+          return acc;
+        },
+        {} as Record<number, { count: number; percentage: number }>,
+      );
+
+      res.json({ stats, total });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  },
+);
+
 // DELETE DIARY ENTRY
 app.delete(
   "/entries/:id",

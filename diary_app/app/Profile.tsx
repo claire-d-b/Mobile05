@@ -5,7 +5,14 @@ import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import { useAuthContext } from "../context/AuthContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Modal, Portal, Text, Button, PaperProvider } from "react-native-paper";
+import {
+  Modal,
+  Portal,
+  Text,
+  Button,
+  PaperProvider,
+  IconButton,
+} from "react-native-paper";
 import CTextInput from "./CTextInput";
 import CIconButton from "./CIconButton";
 import CRating from "./CRating";
@@ -111,6 +118,27 @@ const Profile = ({ login }: Props) => {
     setTotalPages(data.totalPages ?? 0);
   };
 
+  interface Stats {
+    [key: number]: { count: number; percentage: number };
+  }
+
+  const [stats, setStats] = useState<Stats>({});
+
+  const fetchStats = async () => {
+    if (!login) return;
+    try {
+      const res = await fetch(
+        `${backendUrl}/entries/${encodeURIComponent(login)}/stats`,
+      );
+      const data = await res.json();
+      console.log("📊 stats:", data);
+      setStats(data.stats ?? {});
+      console.log("stats", stats);
+    } catch (err) {
+      console.error("❌ fetchStats:", err);
+    }
+  };
+
   const fetchCount = async () => {
     if (!login) return;
 
@@ -206,7 +234,7 @@ const Profile = ({ login }: Props) => {
       // Reset
       setTitle("");
       setContent("");
-      setFeeling(1);
+      setFeeling(3);
       await fetchEntries(0);
       fetchCount();
       // hideModal();
@@ -214,14 +242,21 @@ const Profile = ({ login }: Props) => {
       console.error("❌ Error creating entry:", err);
     }
   };
+
   useEffect(() => {
     setType("");
     if (!login) return;
 
     fetchCount();
     fetchEntries(0);
+    fetchStats();
     setPage(0);
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [entries]);
+  // percentages = { 1: 20, 2: 30, 3: 10, 4: 25, 5: 15 }
 
   return (
     <SafeAreaView
@@ -570,7 +605,7 @@ const Profile = ({ login }: Props) => {
                       </CChip>
                     </View>
                     <CIconButton
-                      icon={emotions[(e.feeling ?? 1) - 1]}
+                      icon={emotions[(e.feeling ?? 3) - 1]}
                       iconColor="#534DB3"
                       containerColor=""
                       size={20}
@@ -591,11 +626,157 @@ const Profile = ({ login }: Props) => {
                 );
               })}
           </View>
-          <Text style={{ color: "#353172", padding: 40 }}>
-            {(totalNbOfEntries > 0 &&
-              `Your feel for ${totalNbOfEntries} entries`) ||
-              `No entry found.`}
-          </Text>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "column",
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={{ color: "#353172", marginBottom: 10 }}>
+              {`Your feels for ${totalNbOfEntries} entries`}
+            </Text>
+            {[1, 2, 3, 4, 5]
+              .filter((f) => stats[f]?.percentage > 0)
+              .map((f) => (
+                <View
+                  key={`stat_${f}`}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginVertical: 4,
+                    width: "100%", // ← pas de flex: 1 ici
+                  }}
+                >
+                  <CIconButton
+                    icon={emotions[f - 1]}
+                    iconColor="#534DB3"
+                    containerColor="transparent"
+                    size={24}
+                    onPress={() => {}}
+                  />
+                  <View
+                    style={{
+                      flex: 1,
+                      height: 8,
+                      backgroundColor: "#e0e0e0",
+                      borderRadius: 4,
+                      marginHorizontal: 8,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: `${stats[f]?.percentage ?? 0}%`,
+                        height: 8,
+                        backgroundColor: "#534DB3",
+                        borderRadius: 4,
+                      }}
+                    />
+                  </View>
+                  <Text
+                    style={{
+                      color: "#353172",
+                      minWidth: 45,
+                      textAlign: "right",
+                    }}
+                  >
+                    {`${stats[f]?.percentage ?? 0}%`}
+                  </Text>
+                </View>
+              ))}
+          </View>
+          <CModal
+            type={type}
+            message={message}
+            visible={visible}
+            hideModal={hideModal}
+            showModal={showModal}
+            style={{ width: "100%", height: "100%" }}
+          >
+            <View style={{ width: "100%", alignSelf: "flex-start" }}>
+              <CTextInput
+                secureTextEntry={false}
+                right={<></>}
+                onBlur={() => {}}
+                onChangeText={(str) => {
+                  setTitle(str);
+                }}
+                label="Title"
+                msg={title}
+                placeholder="Please add a title"
+                variant="outlined"
+                textColor="#534DB3"
+                outlineColor="#534DB3"
+                outlineStyle={{ borderRadius: 10 }}
+                activeOutlineColor="#534DB3"
+                underlineColor="#534DB3"
+                activeUnderlineColor="#534DB3"
+                selectionColor="#534DB3"
+                contentStyle={{}}
+                style={{ marginHorizontal: 20 }}
+                disabled={false}
+                multiline={false}
+              />
+            </View>
+            <View style={{ display: "flex", width: "100%" }}>
+              <CRating
+                setRating={setFeeling}
+                color="#BBB0D1"
+                focusColor="#534DB3"
+              />
+            </View>
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "100%",
+                }}
+              >
+                <CTextInput
+                  secureTextEntry={false}
+                  right={<></>}
+                  onBlur={() => {}}
+                  onChangeText={(str) => {
+                    setContent(str);
+                  }}
+                  label="Content"
+                  msg={content}
+                  placeholder="Please add entries"
+                  variant="outlined"
+                  textColor="#534DB3"
+                  outlineColor="#534DB3"
+                  outlineStyle={{ borderRadius: 10 }}
+                  activeOutlineColor="#534DB3"
+                  underlineColor="#534DB3"
+                  activeUnderlineColor="#534DB3"
+                  selectionColor="#534DB3"
+                  contentStyle={{}}
+                  style={{ marginHorizontal: 20, height: 100 }}
+                  disabled={false}
+                  multiline={true}
+                />
+              </View>
+              <View style={{ alignSelf: "flex-end", marginRight: 20 }}>
+                <CIconButton
+                  icon="plus"
+                  iconColor="white"
+                  containerColor="#534DB3"
+                  size={20}
+                  onPress={handleSubmit}
+                />
+              </View>
+            </View>
+          </CModal>
         </View>
       </PaperProvider>
     </SafeAreaView>
