@@ -60,6 +60,7 @@ const _ = ({ login }: Props) => {
       weekday: "short",
       day: "numeric",
       month: "long",
+      year: "2-digit",
     });
   };
 

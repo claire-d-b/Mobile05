@@ -93,10 +93,6 @@ const Profile = ({ login }: Props) => {
   // const email = auth.currentUser?.email ?? localLogin;
   console.log(localLogin);
 
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toISOString().split("T")[0]; // "2026-05-01"
-  };
-
   const fetchEntries = async (pageNumber = 0) => {
     if (!login) return;
 
@@ -196,6 +192,14 @@ const Profile = ({ login }: Props) => {
   //     setPage(nextPage);
   //   }
   // };
+  const formatDateFR = (date: Date): string => {
+    return date.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "long",
+      year: "2-digit",
+    });
+  };
 
   const handleSubmit = async () => {
     setMessage("");
@@ -601,7 +605,7 @@ const Profile = ({ login }: Props) => {
                         icon=""
                         disabled={true}
                       >
-                        {formatDate(e.created_at)}
+                        {formatDateFR(new Date(e.created_at))}
                       </CChip>
                     </View>
                     <CIconButton
