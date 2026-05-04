@@ -55,6 +55,14 @@ const _ = ({ login }: Props) => {
     return new Date(timestamp).toISOString().split("T")[0]; // "2026-05-01"
   };
 
+  const formatDateFR = (date: Date): string => {
+    return date.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "long",
+    });
+  };
+
   const fetchEntriesByDate = async (selectedDate: Date, pageNumber = 0) => {
     if (!login) return;
     const dateStr = selectedDate.toISOString().split("T")[0];
@@ -75,7 +83,7 @@ const _ = ({ login }: Props) => {
   };
 
   const loadMore = async () => {
-    if (page < totalPages) {
+    if (page + 1 < totalPages) {
       const nextPage = page + 1;
       await fetchEntriesByDate(date ?? new Date(), nextPage);
       // setPage(nextPage);
@@ -123,12 +131,18 @@ const _ = ({ login }: Props) => {
 
   return (
     <SafeAreaView
-      style={{ flex: 1 }}
+      style={{ display: "flex", flex: 1 }}
       edges={["top", "bottom", "left", "right"]}
     >
       <PaperProvider>
         <View
-          style={{ justifyContent: "center", flex: 1, alignItems: "center" }}
+          style={{
+            display: "flex",
+            flex: 1,
+            justifyContent: "flex-start",
+            alignItems: "center",
+            padding: 20,
+          }}
         >
           {/* <Button
             onPress={() => setOpen(true)}
@@ -209,7 +223,7 @@ const _ = ({ login }: Props) => {
                             icon=""
                             disabled={true}
                           >
-                            <Text>{formatDate(e.created_at)}</Text>
+                            <Text>{formatDateFR(new Date(e.created_at))}</Text>
                           </CChip>
                         </View>
                         <CIconButton
@@ -245,25 +259,68 @@ const _ = ({ login }: Props) => {
               showModal={showModal}
               style={{}}
               children={
-                <View>
-                  <CChip
-                    theme={{
-                      colors: {
-                        surfaceDisabled: "#BBB0D1",
-                        onSurfaceDisabled: "#534DB3",
-                      } as any,
+                <View style={{ gap: 8 }}>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      gap: 8,
                     }}
-                    onPress={() => {}}
-                    label=""
-                    mode="outlined"
-                    textStyle={{ color: "#534DB3", padding: 5 }}
-                    style={{}}
-                    buttonColor="#534DB3"
-                    icon=""
-                    disabled={true}
                   >
-                    {`Date: ${formatDate(selectedEntry?.created_at)}`}
-                  </CChip>
+                    <CChip
+                      theme={{
+                        colors: {
+                          surfaceDisabled: "#BBB0D1",
+                          onSurfaceDisabled: "#534DB3",
+                        } as any,
+                      }}
+                      onPress={() => {}}
+                      label=""
+                      mode="flat"
+                      textStyle={{ color: "#534DB3" }}
+                      style={{}}
+                      buttonColor="#534DB3"
+                      icon=""
+                      disabled={true}
+                    >
+                      <Text style={{ color: "gray" }}>date: </Text>
+                      <Text>
+                        {formatDateFR(new Date(selectedEntry?.created_at))}
+                      </Text>
+                    </CChip>
+                    <CIconButton
+                      style={{
+                        backgroundColor: "rgba(229, 231, 235)",
+                      }}
+                      mode="contained"
+                      icon={emotions[(selectedEntry?.feeling ?? 3) - 1]}
+                      iconColor="#534DB3"
+                      containerColor=""
+                      size={18}
+                      onPress={() => {}}
+                    />
+                    <CChip
+                      theme={{
+                        colors: {
+                          surfaceDisabled: "#BBB0D1",
+                          onSurfaceDisabled: "#534DB3",
+                        } as any,
+                      }}
+                      onPress={() => {}}
+                      label=""
+                      mode="flat"
+                      textStyle={{ color: "#534DB3" }}
+                      style={{}}
+                      buttonColor="#534DB3"
+                      icon=""
+                      disabled={true}
+                    >
+                      <Text style={{ color: "gray" }}>title: </Text>
+                      <Text>{selectedEntry.title}</Text>
+                    </CChip>
+                  </View>
                   <View
                     style={{
                       display: "flex",
@@ -271,15 +328,9 @@ const _ = ({ login }: Props) => {
                       flexDirection: "row",
                       justifyContent: "center",
                       alignItems: "center",
+                      gap: 8,
                     }}
                   >
-                    <CIconButton
-                      icon={emotions[(selectedEntry?.feeling ?? 3) - 1]}
-                      iconColor="#534DB3"
-                      containerColor=""
-                      size={20}
-                      onPress={() => {}}
-                    />
                     <CTextInput
                       secureTextEntry={false}
                       right={<></>}

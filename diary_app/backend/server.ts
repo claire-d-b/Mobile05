@@ -410,7 +410,7 @@ app.get(
   async (req: Request<{ email: string; date: string }>, res: Response) => {
     const { email, date } = req.params;
     const page = Number(req.query.page ?? 0);
-    const limit = 3;
+    const limit = 4;
     const offset = page * limit;
 
     try {

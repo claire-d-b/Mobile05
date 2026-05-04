@@ -16,7 +16,7 @@ interface Props {
   style: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
   textStyle: StyleProp<TextStyle>;
   buttonColor?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   icon: string;
   disabled: boolean | undefined;
 }
