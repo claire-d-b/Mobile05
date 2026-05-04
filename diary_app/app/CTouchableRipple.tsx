@@ -11,10 +11,7 @@ interface Props {
 }
 
 const _ = ({ onPress, rippleColor, children }: Props) => (
-  <TouchableRipple
-    onPress={() => console.log("Pressed")}
-    rippleColor={rippleColor}
-  >
+  <TouchableRipple onPress={onPress} rippleColor={rippleColor}>
     {children}
   </TouchableRipple>
 );

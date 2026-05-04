@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Calendar } from "react-native-calendars";
 
 interface Props {
+  page: number;
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   fetchEntriesByDate: (
@@ -11,11 +12,11 @@ interface Props {
 }
 
 // Remplace le Button + DatePickerModal par :
-const _ = ({ date, setDate, fetchEntriesByDate }: Props) => {
+const _ = ({ page, date, setDate, fetchEntriesByDate }: Props) => {
   useEffect(() => {
-    setDate(new Date());
-    fetchEntriesByDate(new Date());
-  }, []);
+    fetchEntriesByDate(date, page);
+    // setDate(date);
+  }, [page, date]);
   return (
     <Calendar
       style={{ width: "100%", borderRadius: 10, marginBottom: 10 }}
@@ -35,7 +36,7 @@ const _ = ({ date, setDate, fetchEntriesByDate }: Props) => {
       onDayPress={(day) => {
         const selected = new Date(day.dateString);
         setDate(selected);
-        fetchEntriesByDate(selected);
+        // fetchEntriesByDate(selected);
       }}
     />
   );

@@ -77,16 +77,16 @@ const _ = ({ login }: Props) => {
   const loadMore = async () => {
     if (page < totalPages) {
       const nextPage = page + 1;
-      await fetchEntriesByDate(date ?? new Date(), page);
-      setPage(nextPage);
+      await fetchEntriesByDate(date ?? new Date(), nextPage);
+      // setPage(nextPage);
     }
   };
 
   const loadLess = async () => {
     if (page > 0) {
       const nextPage = page - 1;
-      await fetchEntriesByDate(date ?? new Date(), page);
-      setPage(nextPage);
+      await fetchEntriesByDate(date ?? new Date(), nextPage);
+      // setPage(nextPage);
     }
   };
 
@@ -138,6 +138,7 @@ const _ = ({ login }: Props) => {
             Pick single date
           </Button> */}
           <CCalendar
+            page={page}
             date={date ?? new Date()}
             setDate={setDate}
             fetchEntriesByDate={fetchEntriesByDate}
@@ -146,8 +147,6 @@ const _ = ({ login }: Props) => {
             entries.length > 0 &&
             entries.map((e, i) => {
               return (
-                // <View key={`entry_${i}`}>
-
                 <View
                   key={`entry_agenda_${i}`}
                   style={{
@@ -204,13 +203,13 @@ const _ = ({ login }: Props) => {
                             onPress={() => {}}
                             label=""
                             mode="outlined"
+                            style={{ padding: 5 }}
                             textStyle={{ color: "#534DB3" }}
-                            style={{}}
                             buttonColor="#534DB3"
                             icon=""
                             disabled={true}
                           >
-                            {formatDate(e.created_at)}
+                            <Text>{formatDate(e.created_at)}</Text>
                           </CChip>
                         </View>
                         <CIconButton
@@ -257,44 +256,56 @@ const _ = ({ login }: Props) => {
                     onPress={() => {}}
                     label=""
                     mode="outlined"
-                    textStyle={{ color: "#534DB3" }}
+                    textStyle={{ color: "#534DB3", padding: 5 }}
                     style={{}}
                     buttonColor="#534DB3"
                     icon=""
                     disabled={true}
                   >
-                    {selectedEntry?.created_at ?? ""}
+                    {`Date: ${formatDate(selectedEntry?.created_at)}`}
                   </CChip>
-                  <CIconButton
-                    icon={emotions[(selectedEntry?.feeling ?? 3) - 1]}
-                    iconColor="#534DB3"
-                    containerColor=""
-                    size={20}
-                    onPress={() => {}}
-                  />
-                  <CTextInput
-                    secureTextEntry={false}
-                    right={<></>}
-                    onBlur={() => {}}
-                    onChangeText={() => {}}
-                    label="Content"
-                    msg={selectedEntry?.content ?? ""}
-                    placeholder=""
-                    variant="outlined"
-                    textColor="#534DB3"
-                    outlineColor="#534DB3"
-                    outlineStyle={{ borderRadius: 10 }}
-                    activeOutlineColor="#534DB3"
-                    underlineColor="#534DB3"
-                    activeUnderlineColor="#534DB3"
-                    selectionColor="#534DB3"
-                    contentStyle={{}}
-                    style={{ marginHorizontal: 20 }}
-                    disabled={true}
-                    multiline={true}
-                  />
+                  <View
+                    style={{
+                      display: "flex",
+                      width: "100%",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CIconButton
+                      icon={emotions[(selectedEntry?.feeling ?? 3) - 1]}
+                      iconColor="#534DB3"
+                      containerColor=""
+                      size={20}
+                      onPress={() => {}}
+                    />
+                    <CTextInput
+                      secureTextEntry={false}
+                      right={<></>}
+                      onBlur={() => {}}
+                      onChangeText={() => {}}
+                      label="Content"
+                      msg={selectedEntry?.content ?? ""}
+                      placeholder=""
+                      variant="outlined"
+                      textColor="#534DB3"
+                      outlineColor="#534DB3"
+                      outlineStyle={{ borderRadius: 10 }}
+                      activeOutlineColor="#534DB3"
+                      underlineColor="#534DB3"
+                      activeUnderlineColor="#534DB3"
+                      selectionColor="#534DB3"
+                      contentStyle={{}}
+                      style={{ flex: 1 }}
+                      disabled={true}
+                      multiline={true}
+                    />
+                  </View>
                 </View>
               }
+              button={false}
+              content=""
             />
           )}
         </View>

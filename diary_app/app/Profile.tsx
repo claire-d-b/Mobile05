@@ -699,6 +699,8 @@ const Profile = ({ login }: Props) => {
             hideModal={hideModal}
             showModal={showModal}
             style={{ width: "100%", height: "100%" }}
+            button={true}
+            content="Add a diary entry or click outside this area to dismiss."
           >
             <View style={{ width: "100%", alignSelf: "flex-start" }}>
               <CTextInput
