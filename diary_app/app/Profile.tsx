@@ -291,7 +291,7 @@ const Profile = ({ login }: Props) => {
             />
             <Text style={{ padding: 20, color: "#353172" }}>{email}</Text>
           </View>
-          <Text style={{ color: "#353172", padding: 40 }}>
+          <Text style={{ color: "#353172", padding: 10 }}>
             Your last diary entries
           </Text>
           {/* <CModal
@@ -633,7 +633,13 @@ const Profile = ({ login }: Props) => {
               paddingHorizontal: 20,
             }}
           >
-            <Text style={{ color: "#353172", marginBottom: 10 }}>
+            <Text
+              style={{
+                color: "#353172",
+                marginBottom: 10,
+                textAlign: "center",
+              }}
+            >
               {`Your feels for ${totalNbOfEntries} entries`}
             </Text>
             {[1, 2, 3, 4, 5]
@@ -678,6 +684,7 @@ const Profile = ({ login }: Props) => {
                       color: "#353172",
                       minWidth: 45,
                       textAlign: "right",
+                      marginRight: 20,
                     }}
                   >
                     {`${stats[f]?.percentage ?? 0}%`}

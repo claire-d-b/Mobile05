@@ -22,7 +22,7 @@ const _ = ({ style }: Props) => {
       focusedIcon: "account",
       unfocusedIcon: "account-outline",
     },
-    { key: "agenda", title: "Agenda", focusedIcon: "agenda" },
+    { key: "agenda", title: "Agenda", focusedIcon: "calendar" },
   ]);
 
   const renderScene = BottomNavigation.SceneMap({
