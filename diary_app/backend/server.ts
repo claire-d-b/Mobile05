@@ -403,3 +403,24 @@ app.delete(
     }
   },
 );
+
+// GET ENTRIES FOR USER BY DATE
+app.get(
+  "/entries/:email/date/:date",
+  async (req: Request<{ email: string; date: string }>, res: Response) => {
+    const { email, date } = req.params;
+    try {
+      const result = await pool.query(
+        `SELECT e.* FROM diary_entries e
+       JOIN users u ON e.user_id = u.id
+       WHERE u.login = $1 AND e.date = $2
+       ORDER BY e.created_at DESC`,
+        [email, date],
+      );
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch entries by date" });
+    }
+  },
+);

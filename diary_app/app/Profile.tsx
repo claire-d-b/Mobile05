@@ -664,7 +664,7 @@ const Profile = ({ login }: Props) => {
                   <View
                     style={{
                       flex: 1,
-                      height: 8,
+                      height: 6,
                       backgroundColor: "#e0e0e0",
                       borderRadius: 4,
                       marginHorizontal: 8,
@@ -673,7 +673,7 @@ const Profile = ({ login }: Props) => {
                     <View
                       style={{
                         width: `${stats[f]?.percentage ?? 0}%`,
-                        height: 8,
+                        height: 6,
                         backgroundColor: "#534DB3",
                         borderRadius: 4,
                       }}
