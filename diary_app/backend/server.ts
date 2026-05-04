@@ -409,15 +409,37 @@ app.get(
   "/entries/:email/date/:date",
   async (req: Request<{ email: string; date: string }>, res: Response) => {
     const { email, date } = req.params;
+    const page = Number(req.query.page ?? 0);
+    const limit = 10;
+    const offset = page * limit;
+
     try {
-      const result = await pool.query(
-        `SELECT e.* FROM diary_entries e
-       JOIN users u ON e.user_id = u.id
-       WHERE u.login = $1 AND e.date = $2
-       ORDER BY e.created_at DESC`,
+      // Count total pour la pagination
+      const countResult = await pool.query(
+        `SELECT COUNT(*) FROM diary_entries e
+         JOIN users u ON e.user_id = u.id
+         WHERE u.login = $1 AND e.date = $2`,
         [email, date],
       );
-      res.json(result.rows);
+      const total = parseInt(countResult.rows[0].count);
+
+      const result = await pool.query(
+        `SELECT e.* FROM diary_entries e
+         JOIN users u ON e.user_id = u.id
+         WHERE u.login = $1 AND e.date = $2
+         ORDER BY e.created_at DESC
+         LIMIT $3 OFFSET $4`,
+        [email, date, limit, offset],
+      );
+
+      res.json({
+        entries: result.rows,
+        page,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: offset + limit < total,
+        hasPrev: page > 0,
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Failed to fetch entries by date" });

@@ -304,6 +304,8 @@ npm install react-native-paper-dates --save
 
 npm install -D babel-plugin-module-resolver
 
+npx expo install react-native-calendars
+
 npx expo run:android --device
 npx expo start --dev-client
 npx expo run:android

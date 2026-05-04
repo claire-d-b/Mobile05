@@ -16,8 +16,8 @@ const successColor = "#085E24";
 const infoColor = "#353172";
 
 interface Props {
-  type: string;
-  message: string;
+  type?: string;
+  message?: string;
   visible: boolean;
   hideModal: () => void;
   showModal: () => void;
