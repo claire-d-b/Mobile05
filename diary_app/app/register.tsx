@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Platform } from "react-native";
+import { View, Platform, Text } from "react-native";
 import { TextInput } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -27,6 +27,23 @@ const Register = () => {
   const [error, setError] = useState("");
   const { setLocalLogin } = useAuthContext();
 
+  const isCorrectPassword = (password: string) => {
+    const hasUppercase = (str: string): boolean => /[A-Z]/.test(str);
+    const hasLowercase = (str: string): boolean => /[a-z]/.test(str);
+    const hasNumber = (str: string): boolean => /[0-9]/.test(str);
+    // matche tout caractère non alphanumérique
+    const hasSpecialChar = (str: string): boolean => /\W/.test(str);
+
+    let isCorrect = true;
+    if (password.length < 8) isCorrect = false;
+    if (hasUppercase(password) === false) isCorrect = false;
+    if (hasLowercase(password) === false) isCorrect = false;
+    if (hasNumber(password) === false) isCorrect = false;
+    if (hasSpecialChar(password) === false) isCorrect = false;
+
+    return isCorrect;
+  };
+
   const handleSubmit = async ({ login, password, npassword }: Information) => {
     setError("");
 
@@ -43,6 +60,13 @@ const Register = () => {
 
     if (password !== npassword) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (isCorrectPassword(password) === false) {
+      setError(
+        "Password does not match required format.\n Password must contain at least:\n- 8 characters\n- 1 lowercase letter\n- one uppercase letter\n- one number\n - one special character.",
+      );
       return;
     }
 
@@ -169,17 +193,7 @@ const Register = () => {
             disabled={false}
             multiline={false}
           />
-          {error ? (
-            <CButton
-              msg={error}
-              variant="text"
-              textColor="red"
-              style={{}}
-              buttonColor="transparent"
-              labelStyle={{}}
-              onPress={() => {}}
-            />
-          ) : null}
+          {error && <Text style={{ color: "red" }}>{error}</Text>}
           <CButton
             onPress={() => handleSubmit({ login, password, npassword })}
             msg="Send"
