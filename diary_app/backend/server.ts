@@ -130,47 +130,88 @@ app.post(
 );
 
 // LOGIN USER
+// app.post(
+//   "/user/login",
+//   async (req: Request<{}, {}, LoginBody>, res: Response) => {
+//     const { login, password } = req.body;
+//     try {
+//       let result = await pool.query("SELECT * FROM users WHERE login = $1", [
+//         login,
+//       ]);
+//       const hashedPassword = await bcrypt.hash(password, 10);
+//       const insertResult = await pool.query(
+//         `INSERT INTO users (login, password, provider)
+//          VALUES ($1, $2, 'local')
+//          RETURNING *`,
+//         [login, hashedPassword],
+//       );
+//       const user = result.rows[0] ?? insertResult;
+
+//       // Vérifie que c'est un compte local
+//       if (user.provider !== "local") {
+//         return res.status(400).json({
+//           error: `Ce compte utilise ${user.provider}. Connecte-toi avec ${user.provider}.`,
+//         });
+//       }
+
+//       const isValid = await bcrypt.compare(password, user.password);
+//       if (!isValid) {
+//         return res.status(400).json({ error: "Invalid password" });
+//       }
+
+//       // Met à jour last_login
+//       await pool.query("UPDATE users SET updated_at = NOW() WHERE id = $1", [
+//         user.id,
+//       ]);
+
+//       console.log("✅ User logged in:", user.login);
+//       res.json({
+//         message: "Login success",
+//         user: { id: user.id, login: user.login, provider: user.provider },
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       res.status(500).json({ error: "Login failed" });
+//     }
+//   },
+// );
+
+// LOGIN USER
 app.post(
   "/user/login",
   async (req: Request<{}, {}, LoginBody>, res: Response) => {
     const { login, password } = req.body;
     try {
-      let result = await pool.query("SELECT * FROM users WHERE login = $1", [
+      const result = await pool.query("SELECT * FROM users WHERE login = $1", [
         login,
       ]);
+
       if (result.rows.length === 0) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const insertResult = await pool.query(
-          `INSERT INTO users (login, password, provider) 
-         VALUES ($1, $2, 'local') 
-         RETURNING *`,
-          [login, hashedPassword],
-        );
-        const user = result.rows[0] ?? insertResult;
+        return res.status(400).json({ error: "User not found" });
+      }
 
-        // Vérifie que c'est un compte local
-        if (user.provider !== "local") {
-          return res.status(400).json({
-            error: `Ce compte utilise ${user.provider}. Connecte-toi avec ${user.provider}.`,
-          });
-        }
+      const user = result.rows[0];
 
-        const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) {
-          return res.status(400).json({ error: "Invalid password" });
-        }
-
-        // Met à jour last_login
-        await pool.query("UPDATE users SET updated_at = NOW() WHERE id = $1", [
-          user.id,
-        ]);
-
-        console.log("✅ User logged in:", user.login);
-        res.json({
-          message: "Login success",
-          user: { id: user.id, login: user.login, provider: user.provider },
+      if (user.provider !== "local") {
+        return res.status(400).json({
+          error: `Ce compte utilise ${user.provider}.`,
         });
       }
+
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) {
+        return res.status(400).json({ error: "Invalid password" });
+      }
+
+      await pool.query("UPDATE users SET updated_at = NOW() WHERE id = $1", [
+        user.id,
+      ]);
+
+      console.log("✅ User logged in:", user.login);
+      res.json({
+        message: "Login success",
+        user: { id: user.id, login: user.login, provider: user.provider },
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Login failed" });

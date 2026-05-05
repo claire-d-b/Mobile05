@@ -3,6 +3,7 @@ import { View, Platform } from "react-native";
 import { TextInput } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useAuthContext } from "../context/AuthContext";
 import { router } from "expo-router";
 import auth from "../config/firebase";
 import useGoogleAuth from "./auth_google";
@@ -15,9 +16,8 @@ interface Information {
   password: string;
 }
 
-const backendUrl = Platform.OS === "android"
-  ? "http://10.0.2.2:3000"
-  : "http://localhost:3000";
+const backendUrl =
+  Platform.OS === "android" ? "http://10.0.2.2:3000" : "http://localhost:3000";
 
 const SignIn = () => {
   const [login, setLogin] = useState("");
@@ -27,7 +27,7 @@ const SignIn = () => {
 
   const { promptAsync: googlePrompt, request: googleRequest } = useGoogleAuth();
   const { promptAsync: githubPrompt, request: githubRequest } = useGithubAuth();
-
+  const { setLocalLogin } = useAuthContext(); // ← ajoute ça
   const handleSubmit = async ({ login, password }: Information) => {
     setError("");
     try {
@@ -46,16 +46,18 @@ const SignIn = () => {
       }
 
       const provider = data.user?.provider;
+      console.log("PROVIDER", provider);
       console.log("✅ Backend login success, provider:", provider);
 
       if (provider === "local") {
         // Compte local → pas de Firebase
+        await setLocalLogin(login);
         console.log("✅ Backend registration success:", data.user);
-        router.replace("/signin");
+        router.replace("/home");
       } else {
         // Compte Google/GitHub → Firebase
         await signInWithEmailAndPassword(auth, login, password);
-        setLogin('')
+        setLogin("");
         // _layout.tsx redirige via onAuthStateChanged
       }
     } catch (err) {
@@ -65,107 +67,116 @@ const SignIn = () => {
   };
 
   return (
-        <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom", "left", "right"]}>
-    
-    <View style={{ width: "100%", height: "100%", flexDirection: "column",
-      alignItems: "center", justifyContent: "center" }}>
-      <View style={{ width: "100%", padding: 10 }}>
-        <CTextInput
-          secureTextEntry={false}
-          right={<></>}
-          onBlur={() => {}}
-          onChangeText={(text: string) => setLogin(text)}
-          label="login"
-          msg={login}
-          placeholder="Type your login"
-          variant="outlined"
-          textColor="#534DB3"
-          outlineColor="#534DB3"
-          outlineStyle={{ borderRadius: 10 }}
-          activeOutlineColor="#534DB3"
-          underlineColor="#534DB3"
-          activeUnderlineColor="#534DB3"
-          selectionColor="#534DB3"
-          contentStyle={{}}
-          style={{ width: "100%" }}
-          disabled={false}
-          multiline={false}
-        />
-        <CTextInput
-          secureTextEntry={secure}
-          right={
-            <TextInput.Icon
-              icon={secure ? "eye-off" : "eye"}
-              onPress={() => setSecure(!secure)}
+    <SafeAreaView
+      style={{ flex: 1 }}
+      edges={["top", "bottom", "left", "right"]}
+    >
+      <View
+        style={{
+          width: "100%",
+          height: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <View style={{ width: "100%", padding: 10 }}>
+          <CTextInput
+            secureTextEntry={false}
+            right={<></>}
+            onBlur={() => {}}
+            onChangeText={(text: string) => setLogin(text)}
+            label="login"
+            msg={login}
+            placeholder="Type your login"
+            variant="outlined"
+            textColor="#534DB3"
+            outlineColor="#534DB3"
+            outlineStyle={{ borderRadius: 10 }}
+            activeOutlineColor="#534DB3"
+            underlineColor="#534DB3"
+            activeUnderlineColor="#534DB3"
+            selectionColor="#534DB3"
+            contentStyle={{}}
+            style={{ width: "100%" }}
+            disabled={false}
+            multiline={false}
+          />
+          <CTextInput
+            secureTextEntry={secure}
+            right={
+              <TextInput.Icon
+                icon={secure ? "eye-off" : "eye"}
+                onPress={() => setSecure(!secure)}
+              />
+            }
+            onBlur={() => {}}
+            onChangeText={(text: string) => setPassword(text)}
+            label="password"
+            msg={password}
+            placeholder="Type your password"
+            variant="outlined"
+            textColor="#534DB3"
+            outlineColor="#534DB3"
+            outlineStyle={{ borderRadius: 10 }}
+            activeOutlineColor="#534DB3"
+            underlineColor="#534DB3"
+            activeUnderlineColor="#534DB3"
+            selectionColor="#534DB3"
+            contentStyle={{}}
+            style={{ width: "100%" }}
+            disabled={false}
+            multiline={false}
+          />
+          {error ? (
+            <CButton
+              msg={error}
+              variant="text"
+              textColor="red"
+              style={{}}
+              buttonColor="transparent"
+              labelStyle={{}}
+              onPress={() => {}}
             />
-          }
-          onBlur={() => {}}
-          onChangeText={(text: string) => setPassword(text)}
-          label="password"
-          msg={password}
-          placeholder="Type your password"
-          variant="outlined"
-          textColor="#534DB3"
-          outlineColor="#534DB3"
-          outlineStyle={{ borderRadius: 10 }}
-          activeOutlineColor="#534DB3"
-          underlineColor="#534DB3"
-          activeUnderlineColor="#534DB3"
-          selectionColor="#534DB3"
-          contentStyle={{}}
-          style={{ width: "100%" }}
-          disabled={false}
-          multiline={false}
-        />
-        {error ? (
+          ) : null}
           <CButton
-            msg={error}
+            onPress={() => handleSubmit({ login, password })}
+            msg="Send"
+            variant="contained"
+            textColor="white"
+            style={{ display: "flex", alignSelf: "flex-end", marginTop: 20 }}
+            buttonColor="#534DB3"
+            labelStyle={{}}
+          />
+          <CButton
+            onPress={() => router.push("/register")}
+            msg="Not registered yet ? Create an account"
             variant="text"
-            textColor="red"
-            style={{}}
+            textColor="#534DB3"
+            style={{ display: "flex", alignSelf: "flex-end" }}
             buttonColor="transparent"
             labelStyle={{}}
-            onPress={() => {}}
           />
-        ) : null}
-        <CButton
-          onPress={() => handleSubmit({ login, password })}
-          msg="Send"
-          variant="contained"
-          textColor="white"
-          style={{ display: "flex", alignSelf: "flex-end", marginTop: 20 }}
-          buttonColor="#534DB3"
-          labelStyle={{}}
-        />
-        <CButton
-          onPress={() => router.push("/register")}
-          msg="Not registered yet ? Create an account"
-          variant="text"
-          textColor="#534DB3"
-          style={{ display: "flex", alignSelf: "flex-end" }}
-          buttonColor="transparent"
-          labelStyle={{}}
-        />
-        <CButton
-          onPress={() => googleRequest && googlePrompt()}
-          msg="Connect with Google"
-          variant="text"
-          textColor="gray"
-          style={{ display: "flex", alignSelf: "flex-end" }}
-          buttonColor="transparent"
-          labelStyle={{}}
-        />
-        <CButton
-          onPress={() => githubRequest && githubPrompt()}
-          msg="Connect with Github"
-          variant="text"
-          textColor="gray"
-          style={{ display: "flex", alignSelf: "flex-end" }}
-          buttonColor="transparent"
-          labelStyle={{}}
-        />
+          <CButton
+            onPress={() => googleRequest && googlePrompt()}
+            msg="Connect with Google"
+            variant="text"
+            textColor="gray"
+            style={{ display: "flex", alignSelf: "flex-end" }}
+            buttonColor="transparent"
+            labelStyle={{}}
+          />
+          <CButton
+            onPress={() => githubRequest && githubPrompt()}
+            msg="Connect with Github"
+            variant="text"
+            textColor="gray"
+            style={{ display: "flex", alignSelf: "flex-end" }}
+            buttonColor="transparent"
+            labelStyle={{}}
+          />
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

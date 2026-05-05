@@ -177,21 +177,6 @@ const Profile = ({ login }: Props) => {
     }
   };
 
-  // const loadMore = async () => {
-  //   if (page < totalPages) {
-  //     const nextPage = page + 1;
-  //     await fetchEntries(nextPage);
-  //     setPage(nextPage);
-  //   }
-  // };
-
-  // const loadLess = async () => {
-  //   if (page > 0) {
-  //     const nextPage = page - 1;
-  //     await fetchEntries(nextPage);
-  //     setPage(nextPage);
-  //   }
-  // };
   const formatDateFR = (date: Date): string => {
     return date.toLocaleDateString("fr-FR", {
       weekday: "short",
@@ -298,131 +283,7 @@ const Profile = ({ login }: Props) => {
           <Text style={{ color: "#353172", padding: 10 }}>
             Your last diary entries
           </Text>
-          {/* <CModal
-            type={type}
-            message={message}
-            visible={visible}
-            hideModal={hideModal}
-            showModal={showModal}
-            style={{ width: "100%", height: "100%" }}
-          >
-            <View style={{ width: "100%", alignSelf: "flex-start" }}>
-              <CTextInput
-                secureTextEntry={false}
-                right={<></>}
-                onBlur={() => {}}
-                onChangeText={(str) => {
-                  setTitle(str);
-                }}
-                label="Title"
-                msg={title}
-                placeholder="Please add a title"
-                variant="outlined"
-                textColor="#534DB3"
-                outlineColor="#534DB3"
-                outlineStyle={{ borderRadius: 10 }}
-                activeOutlineColor="#534DB3"
-                underlineColor="#534DB3"
-                activeUnderlineColor="#534DB3"
-                selectionColor="#534DB3"
-                contentStyle={{}}
-                style={{ marginHorizontal: 20 }}
-                disabled={false}
-                multiline={false}
-              />
-            </View>
-            <View style={{ display: "flex", width: "100%" }}>
-              <CRating
-                setRating={setFeeling}
-                color="#BBB0D1"
-                focusColor="#534DB3"
-              />
-            </View>
-
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  width: "100%",
-                }}
-              >
-                <CTextInput
-                  secureTextEntry={false}
-                  right={<></>}
-                  onBlur={() => {}}
-                  onChangeText={(str) => {
-                    setContent(str);
-                  }}
-                  label="Content"
-                  msg={content}
-                  placeholder="Please add entries"
-                  variant="outlined"
-                  textColor="#534DB3"
-                  outlineColor="#534DB3"
-                  outlineStyle={{ borderRadius: 10 }}
-                  activeOutlineColor="#534DB3"
-                  underlineColor="#534DB3"
-                  activeUnderlineColor="#534DB3"
-                  selectionColor="#534DB3"
-                  contentStyle={{}}
-                  style={{ marginHorizontal: 20, height: 100 }}
-                  disabled={false}
-                  multiline={true}
-                />
-              </View>
-              <View style={{ alignSelf: "flex-end", marginRight: 20 }}>
-                <CIconButton
-                  icon="plus"
-                  iconColor="white"
-                  containerColor="#534DB3"
-                  size={20}
-                  onPress={handleSubmit}
-                />
-              </View>
-            </View>
-          </CModal> */}
-          {/* </View> */}
-          {/* <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-around",
-              alignItems: "center",
-            }}
-          >
-            <CIconButton
-              icon="chevron-left"
-              iconColor="#534DB3"
-              containerColor=""
-              size={25}
-              onPress={loadLess}
-            />
-            <CIconButton
-              icon="chevron-right"
-              iconColor="#534DB3"
-              containerColor=""
-              size={25}
-              onPress={loadMore}
-            />
-          </View> */}
           {totalNbOfEntries < 2 && (
-            // <CModal
-            //   type={type}
-            //   message={message}
-            //   visible={visible}
-            //   hideModal={hideModal}
-            //   showModal={showModal}
-            //   style={{ width: "100%", height: "100%" }}
-            // >
             <View style={{ flex: 1, width: "100%" }}>
               <View style={{ width: "100%", alignSelf: "flex-start" }}>
                 <CTextInput
@@ -637,15 +498,17 @@ const Profile = ({ login }: Props) => {
               paddingHorizontal: 20,
             }}
           >
-            <Text
-              style={{
-                color: "#353172",
-                marginBottom: 10,
-                textAlign: "center",
-              }}
-            >
-              {`Your feels for ${totalNbOfEntries} entries`}
-            </Text>
+            {totalNbOfEntries > 0 && (
+              <Text
+                style={{
+                  color: "#353172",
+                  marginBottom: 10,
+                  textAlign: "center",
+                }}
+              >
+                {`Your feels for ${totalNbOfEntries} entries`}
+              </Text>
+            )}
             {[1, 2, 3, 4, 5]
               .filter((f) => stats[f]?.percentage > 0)
               .map((f) => (
@@ -696,75 +559,28 @@ const Profile = ({ login }: Props) => {
                 </View>
               ))}
           </View>
-          <CModal
-            type={type}
-            message={message}
-            visible={visible}
-            hideModal={hideModal}
-            showModal={showModal}
-            style={{ width: "100%", height: "100%" }}
-            button={true}
-            content="Add a diary entry or click outside this area to dismiss."
-          >
-            <View style={{ width: "100%", alignSelf: "flex-start" }}>
-              <CTextInput
-                secureTextEntry={false}
-                right={<></>}
-                onBlur={() => {}}
-                onChangeText={(str) => {
-                  setTitle(str);
-                }}
-                label="Title"
-                msg={title}
-                placeholder="Please add a title"
-                variant="outlined"
-                textColor="#534DB3"
-                outlineColor="#534DB3"
-                outlineStyle={{ borderRadius: 10 }}
-                activeOutlineColor="#534DB3"
-                underlineColor="#534DB3"
-                activeUnderlineColor="#534DB3"
-                selectionColor="#534DB3"
-                contentStyle={{}}
-                style={{ marginHorizontal: 20 }}
-                disabled={false}
-                multiline={false}
-              />
-            </View>
-            <View style={{ display: "flex", width: "100%" }}>
-              <CRating
-                setRating={setFeeling}
-                color="#BBB0D1"
-                focusColor="#534DB3"
-              />
-            </View>
-
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+          {totalNbOfEntries >= 2 && (
+            <CModal
+              type={type}
+              message={message}
+              visible={visible}
+              hideModal={hideModal}
+              showModal={showModal}
+              style={{ width: "100%", height: "100%" }}
+              button={true}
+              content="Add a diary entry or click outside this area to dismiss."
             >
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  width: "100%",
-                }}
-              >
+              <View style={{ width: "100%", alignSelf: "flex-start" }}>
                 <CTextInput
                   secureTextEntry={false}
                   right={<></>}
                   onBlur={() => {}}
                   onChangeText={(str) => {
-                    setContent(str);
+                    setTitle(str);
                   }}
-                  label="Content"
-                  msg={content}
-                  placeholder="Please add entries"
+                  label="Title"
+                  msg={title}
+                  placeholder="Please add a title"
                   variant="outlined"
                   textColor="#534DB3"
                   outlineColor="#534DB3"
@@ -774,22 +590,71 @@ const Profile = ({ login }: Props) => {
                   activeUnderlineColor="#534DB3"
                   selectionColor="#534DB3"
                   contentStyle={{}}
-                  style={{ marginHorizontal: 20, height: 100 }}
+                  style={{ marginHorizontal: 20 }}
                   disabled={false}
-                  multiline={true}
+                  multiline={false}
                 />
               </View>
-              <View style={{ alignSelf: "flex-end", marginRight: 20 }}>
-                <CIconButton
-                  icon="plus"
-                  iconColor="white"
-                  containerColor="#534DB3"
-                  size={20}
-                  onPress={handleSubmit}
+              <View style={{ display: "flex", width: "100%" }}>
+                <CRating
+                  setRating={setFeeling}
+                  color="#BBB0D1"
+                  focusColor="#534DB3"
                 />
               </View>
-            </View>
-          </CModal>
+
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "100%",
+                  }}
+                >
+                  <CTextInput
+                    secureTextEntry={false}
+                    right={<></>}
+                    onBlur={() => {}}
+                    onChangeText={(str) => {
+                      setContent(str);
+                    }}
+                    label="Content"
+                    msg={content}
+                    placeholder="Please add entries"
+                    variant="outlined"
+                    textColor="#534DB3"
+                    outlineColor="#534DB3"
+                    outlineStyle={{ borderRadius: 10 }}
+                    activeOutlineColor="#534DB3"
+                    underlineColor="#534DB3"
+                    activeUnderlineColor="#534DB3"
+                    selectionColor="#534DB3"
+                    contentStyle={{}}
+                    style={{ marginHorizontal: 20, height: 100 }}
+                    disabled={false}
+                    multiline={true}
+                  />
+                </View>
+                <View style={{ alignSelf: "flex-end", marginRight: 20 }}>
+                  <CIconButton
+                    icon="plus"
+                    iconColor="white"
+                    containerColor="#534DB3"
+                    size={20}
+                    onPress={handleSubmit}
+                  />
+                </View>
+              </View>
+            </CModal>
+          )}
         </View>
       </PaperProvider>
     </SafeAreaView>
@@ -797,12 +662,3 @@ const Profile = ({ login }: Props) => {
 };
 
 export default Profile;
-
-// id SERIAL PRIMARY KEY,
-// user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-// date DATE NOT NULL DEFAULT CURRENT_DATE,
-// title VARCHAR(255),
-// feeling INTEGER CHECK (feeling BETWEEN 1 AND 5),
-// content TEXT,
-// created_at TIMESTAMP DEFAULT NOW(),
-// updated_at TIMESTAMP DEFAULT NOW()

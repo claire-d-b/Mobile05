@@ -286,10 +286,12 @@ const _ = ({ login }: Props) => {
                       icon=""
                       disabled={true}
                     >
-                      <Text style={{ color: "gray" }}>date: </Text>
-                      <Text>
-                        {formatDateFR(new Date(selectedEntry?.created_at))}
-                      </Text>
+                      <>
+                        <Text style={{ color: "gray" }}>date: </Text>
+                        <Text>
+                          {formatDateFR(new Date(selectedEntry?.created_at))}
+                        </Text>
+                      </>
                     </CChip>
                     <CIconButton
                       style={{
@@ -318,8 +320,10 @@ const _ = ({ login }: Props) => {
                       icon=""
                       disabled={true}
                     >
-                      <Text style={{ color: "gray" }}>title: </Text>
-                      <Text>{selectedEntry.title}</Text>
+                      <>
+                        <Text style={{ color: "gray" }}>title: </Text>
+                        <Text>{selectedEntry.title}</Text>
+                      </>
                     </CChip>
                   </View>
                   <View
